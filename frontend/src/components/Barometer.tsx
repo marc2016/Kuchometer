@@ -3,8 +3,9 @@ interface BarometerProps {
 }
 
 export function Barometer({ days }: BarometerProps) {
-  const position = days === null ? 0 : (Math.min(days, 30) / 30) * 100;
-  const wobble = days === null ? 0.12 : 0.12 + (Math.min(days, 30) / 30) * 0.88;
+  const cappedDays = days === null ? 30 : Math.min(days, 30);
+  const position = (cappedDays / 30) * 100;
+  const wobble = 0.12 + (cappedDays / 30) * 0.88;
 
   return (
     <div className="barometer" aria-label="Kuchometer Barometer">

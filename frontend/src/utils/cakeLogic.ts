@@ -1,5 +1,5 @@
 import type { CakeEntry } from "../types/cake";
-import { getCakeResetTime } from "./dateUtils";
+import { getCakeResetTime, getTodayString } from "./dateUtils";
 
 export function getActiveCakeEntries(entries: CakeEntry[], now = new Date()): CakeEntry[] {
   return entries.filter((entry) => getCakeResetTime(entry.date) <= now);
@@ -34,6 +34,43 @@ export function getDaysSinceLastCake(entries: CakeEntry[], now = new Date()): nu
 
 export function hasCakeOnDay(entries: CakeEntry[], dateStr: string): boolean {
   return entries.some((entry) => entry.date === dateStr);
+}
+
+export function getForecastDayEntries(
+  entries: CakeEntry[],
+  dateStr: string,
+  now = new Date()
+): CakeEntry[] {
+  const today = getTodayString(now);
+  const dayEntries = entries.filter((entry) => entry.date === dateStr);
+
+  if (dateStr > today) {
+    return dayEntries;
+  }
+
+  if (dateStr === today) {
+    return getActiveCakeEntries(entries, now).filter((entry) => entry.date === dateStr);
+  }
+
+  return [];
+}
+
+export function hasCakeOnForecastDay(
+  entries: CakeEntry[],
+  dateStr: string,
+  now = new Date()
+): boolean {
+  const today = getTodayString(now);
+
+  if (dateStr > today) {
+    return hasCakeOnDay(entries, dateStr);
+  }
+
+  if (dateStr === today) {
+    return getActiveCakeEntries(entries, now).some((entry) => entry.date === dateStr);
+  }
+
+  return false;
 }
 
 export function sortEntries(entries: CakeEntry[]): CakeEntry[] {

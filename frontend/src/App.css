@@ -512,6 +512,9 @@ input {
   border-radius: 0.6rem;
   background: var(--surface);
   box-shadow: 0 1px 4px var(--shadow);
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
   transition:
     border-color 0.2s ease,
     background-color 0.2s ease,
@@ -528,8 +531,12 @@ input {
 
 .forecast-card--history {
   cursor: pointer;
-  font: inherit;
-  color: inherit;
+}
+
+.forecast-card--selected {
+  border-color: var(--accent);
+  background: var(--hover-bg);
+  box-shadow: 0 4px 12px var(--shadow);
 }
 
 .forecast-card--today:hover {
@@ -551,6 +558,15 @@ input {
   line-height: 1.1;
   opacity: 0.9;
   white-space: nowrap;
+}
+
+.forecast-name {
+  font-size: clamp(0.65rem, 2.2vw, 0.82rem);
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: center;
+  word-break: break-word;
 }
 
 .modal-overlay {
