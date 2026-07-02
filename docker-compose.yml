@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: kuchometer
+      POSTGRES_USER: kuchometer
+      POSTGRES_PASSWORD: kuchometer
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kuchometer"]
+      interval: 5s
+      retries: 5
+    ports:
+      - "5432:5432"
+
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://kuchometer:kuchometer@db:5432/kuchometer
+      PORT: 3001
+      TZ: Europe/Berlin
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
