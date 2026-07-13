@@ -7,8 +7,8 @@ interface BarometerProps {
   ready?: boolean;
 }
 
-const DOWN_DURATION_MS = 3200;
-const UP_DURATION_MS = 5000;
+const DOWN_DURATION_MS = 4200;
+const UP_DURATION_MS = 9000;
 
 function toPosition(days: number | null): number {
   const capped = days === null ? 30 : Math.min(Math.max(days, 0), 30);

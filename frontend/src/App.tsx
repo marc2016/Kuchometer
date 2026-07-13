@@ -17,7 +17,7 @@ import { getSimulatedDays, getForecastEntries } from "./utils/simulation";
 import { getPressureLevels } from "./utils/pressure";
 import "./App.css";
 
-const REVEAL_DURATION_MS = 4800;
+const REVEAL_DURATION_MS = 8700;
 
 function App() {
   const { entries, loading, error, addCake, reload } = useCakes();
