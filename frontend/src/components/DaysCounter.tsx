@@ -4,7 +4,7 @@ interface DaysCounterProps {
 
 export function DaysCounter({ days }: DaysCounterProps) {
   if (days === null) {
-    return <p className="days-counter days-counter--empty">Noch kein Kuchen eingetragen</p>;
+    return null;
   }
 
   const valueLabel = days === 1 ? "1 Arbeitstag" : `${days} Arbeitstage`;

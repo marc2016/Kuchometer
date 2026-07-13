@@ -36,6 +36,43 @@ export function hasCakeOnDay(entries: CakeEntry[], dateStr: string): boolean {
   return entries.some((entry) => entry.date === dateStr);
 }
 
+export function isLastCakeToday(entries: CakeEntry[], now = new Date()): boolean {
+  const activeEntries = getActiveCakeEntries(entries, now);
+  if (activeEntries.length === 0) {
+    return false;
+  }
+
+  const today = getTodayString(now);
+  let latestDate = "";
+  for (const entry of activeEntries) {
+    if (entry.date > latestDate) {
+      latestDate = entry.date;
+    }
+  }
+
+  return latestDate === today;
+}
+
+export function getDaysBeforeLastCake(entries: CakeEntry[], now = new Date()): number | null {
+  const resetTimes = getActiveCakeEntries(entries, now)
+    .map((entry) => getCakeResetTime(entry.date).getTime())
+    .sort((a, b) => a - b);
+
+  if (resetTimes.length === 0) {
+    return null;
+  }
+
+  const last = resetTimes[resetTimes.length - 1];
+  const previous = resetTimes.length >= 2 ? resetTimes[resetTimes.length - 2] : null;
+
+  if (previous === null) {
+    // Kein früherer Kuchen bekannt -> das Barometer stand auf Maximum.
+    return 30;
+  }
+
+  return Math.max(0, Math.floor((last - previous) / (1000 * 60 * 60 * 24)));
+}
+
 export function getForecastDayEntries(
   entries: CakeEntry[],
   dateStr: string,
