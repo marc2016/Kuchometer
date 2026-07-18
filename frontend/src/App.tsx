@@ -19,6 +19,7 @@ import {
 } from "./utils/cakeLogic";
 import { getSimulatedDays, getForecastEntries } from "./utils/simulation";
 import { getPressureLevels } from "./utils/pressure";
+import { triggerCakeRain } from "./utils/cakeConfetti";
 import "./App.css";
 
 const REVEAL_DURATION_MS = 8700;
@@ -66,6 +67,15 @@ function App() {
 
   const days = simulatedDays ?? getDaysSinceLastCake(entries, now);
   const forecastEntries = getForecastEntries(entries, simulatedDays, now);
+
+  const hasRainRun = useRef(false);
+
+  useEffect(() => {
+    if (!loading && days === 0 && !hasRainRun.current && !prefersReducedMotion) {
+      hasRainRun.current = true;
+      triggerCakeRain();
+    }
+  }, [loading, days, prefersReducedMotion]);
 
   const cakeToday = simulatedDays === null && !loading && isLastCakeToday(entries, now);
   const introFromDays = cakeToday ? getDaysBeforeLastCake(entries, now) : null;
