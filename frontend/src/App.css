@@ -1377,4 +1377,119 @@ input {
     top: 1rem;
     right: 4.5rem;
   }
+  .dev-panel {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+  }
 }
+
+.dev-panel {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
+  height: 2.75rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 2px 8px var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text);
+  font-size: 0.875rem;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.dev-panel:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 4px 14px var(--shadow);
+}
+
+.dev-panel-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.dev-panel-input {
+  width: 4rem;
+  height: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--input-bg);
+  color: var(--text);
+  padding: 0 0.35rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.dev-panel-input:focus {
+  border-color: var(--accent);
+}
+
+/* Chrome, Safari, Edge, Opera: remove spinbuttons */
+.dev-panel-input::-webkit-outer-spin-button,
+.dev-panel-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox: remove spinbuttons */
+.dev-panel-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+.dev-panel-clear-btn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 4px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.dev-panel-clear-btn:hover {
+  background: var(--hover-bg);
+  color: var(--accent-hover);
+}
+
+.dev-panel-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  cursor: pointer;
+  width: 1.75rem;
+  height: 1.75rem;
+  display: grid;
+  place-items: center;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.1s ease;
+}
+
+.dev-panel-btn:hover {
+  background: var(--hover-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: scale(1.06);
+}
+
+.dev-panel-btn:active {
+  transform: scale(0.94);
+}
+

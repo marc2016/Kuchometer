@@ -2,11 +2,13 @@
   "name": "kuchometer",
   "private": true,
   "scripts": {
-    "dev": "docker compose up db -d && wait-on tcp:localhost:5432 && concurrently -k -n api,web -c green,cyan \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "dev": "docker compose up db dex -d && wait-on tcp:localhost:5432 && concurrently -k -n api,web -c green,cyan \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
     "dev:web": "npm run dev --prefix frontend",
     "dev:api": "npm run dev --prefix backend",
     "dev:db": "docker compose up db -d",
-    "build": "npm run build --prefix backend && npm run build --prefix frontend"
+    "build": "npm run build --prefix backend && npm run build --prefix frontend",
+    "start": "npm run prod",
+    "prod": "docker compose up db dex -d && wait-on tcp:localhost:5432 && npm run build && concurrently -k -n api,web -c green,cyan \"npm run start --prefix backend\" \"npm run preview --prefix frontend\""
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

@@ -18,6 +18,7 @@ import {
   isLastCakeToday,
 } from "./utils/cakeLogic";
 import { getSimulatedDays, getForecastEntries } from "./utils/simulation";
+import { DevPanel } from "./components/DevPanel";
 import { getPressureLevels } from "./utils/pressure";
 import { triggerCakeRain } from "./utils/cakeConfetti";
 import "./App.css";
@@ -29,7 +30,21 @@ function App() {
   const { user, authEnabled, loading: authLoading, logout } = useAuth();
   const [now, setNow] = useState(() => new Date());
   const [historyOpen, setHistoryOpen] = useState(false);
-  const simulatedDays = getSimulatedDays();
+  const [simulatedDays, setSimulatedDays] = useState<number | null>(() => getSimulatedDays());
+  const hasRainRun = useRef(false);
+
+  const handleSimulatedDaysChange = (val: number | null) => {
+    if (val === null) {
+      localStorage.removeItem("kuchometer_simulate_days");
+    } else {
+      localStorage.setItem("kuchometer_simulate_days", String(val));
+      if (val === 0) {
+        hasRainRun.current = true;
+        triggerCakeRain();
+      }
+    }
+    setSimulatedDays(val);
+  };
 
   const prefersReducedMotion =
     typeof window !== "undefined" &&
@@ -68,12 +83,19 @@ function App() {
   const days = simulatedDays ?? getDaysSinceLastCake(entries, now);
   const forecastEntries = getForecastEntries(entries, simulatedDays, now);
 
-  const hasRainRun = useRef(false);
+  // hasRainRun ref is defined above to be accessible by handleSimulatedDaysChange
 
   useEffect(() => {
-    if (!loading && days === 0 && !hasRainRun.current && !prefersReducedMotion) {
-      hasRainRun.current = true;
-      triggerCakeRain();
+    if (loading) {
+      return;
+    }
+    if (days === 0) {
+      if (!hasRainRun.current && !prefersReducedMotion) {
+        hasRainRun.current = true;
+        triggerCakeRain();
+      }
+    } else {
+      hasRainRun.current = false;
     }
   }, [loading, days, prefersReducedMotion]);
 
@@ -106,6 +128,11 @@ function App() {
         <div className="atmosphere-embers" />
       </div>
       <ThemeToggle />
+      <DevPanel
+        simulatedDays={simulatedDays}
+        onChangeSimulatedDays={handleSimulatedDaysChange}
+        currentDays={days}
+      />
       <UserProfile user={user} authEnabled={authEnabled} loading={authLoading} onLogout={logout} />
       <div className={`app-quake${levels.shake > 0 ? " app-quake--on" : ""}`}>
         <header className="app-header">

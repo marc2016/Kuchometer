@@ -41,8 +41,8 @@ export function getPressureLevels(days: number | null): PressureLevels {
   return {
     pressure,
     heat: ramp(pressure, 0.25, 1),
-    steam: ramp(pressure, 0.3, 0.9),
-    crack: ramp(pressure, 0.45, 1),
+    steam: ramp(pressure, 0.15, 0.8), // Starts around day 4.5, yielding steam at the end of green (day 9-10)
+    crack: ramp(pressure, 0.26, 0.8), // Starts around day 8, yielding ~2 cracks at day 10
     flame: ramp(pressure, 0.6, 1),
     shake: ramp(pressure, 0.82, 1),
   };
