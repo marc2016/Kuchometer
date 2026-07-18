@@ -1,0 +1,27 @@
+issuer: http://localhost:5556/dex
+storage:
+  type: sqlite3
+  config:
+    file: ":memory:"
+web:
+  http: 0.0.0.0:5556
+staticClients:
+  - id: kuchometer-app
+    redirectURIs:
+      - http://localhost:5173/api/auth/callback
+      - http://localhost:8080/api/auth/callback
+      - http://localhost:3001/api/auth/callback
+    name: 'Kuchometer'
+    secret: kuchometer-secret
+enablePasswordDB: true
+staticPasswords:
+  - email: admin@example.com
+    # bcrypt hash of "password"
+    hash: "$2a$10$wVR82ufGPJiGqyGg9Qk/X.JtB6S.Q/mI7c90b6lP6c/r9yD94Wz9K"
+    username: admin
+    userID: "12345"
+  - email: user@example.com
+    # bcrypt hash of "password"
+    hash: "$2a$10$wVR82ufGPJiGqyGg9Qk/X.JtB6S.Q/mI7c90b6lP6c/r9yD94Wz9K"
+    username: user
+    userID: "54321"

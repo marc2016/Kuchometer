@@ -1,15 +1,20 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useState, useEffect } from "react";
 import { getTodayString } from "../utils/dateUtils";
 
 interface CakeFormProps {
   onSubmit: (name: string, date?: string) => Promise<void>;
+  defaultName?: string;
 }
 
-export function CakeForm({ onSubmit }: CakeFormProps) {
-  const [name, setName] = useState("");
+export function CakeForm({ onSubmit, defaultName = "" }: CakeFormProps) {
+  const [name, setName] = useState(defaultName);
   const [date, setDate] = useState(getTodayString());
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setName(defaultName);
+  }, [defaultName]);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -25,7 +30,7 @@ export function CakeForm({ onSubmit }: CakeFormProps) {
 
     try {
       await onSubmit(trimmedName, date);
-      setName("");
+      setName(defaultName);
       setDate(getTodayString());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Speichern fehlgeschlagen.");

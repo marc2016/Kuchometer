@@ -8,6 +8,10 @@ import { Forecast } from "./components/Forecast";
 import { HistoryModal } from "./components/HistoryModal";
 import { ThemeToggle } from "./components/ThemeToggle";
 import { useCakes } from "./hooks/useCakes";
+import { useAuth } from "./hooks/useAuth";
+import { UserProfile } from "./components/UserProfile";
+import { mdiLogin } from "@mdi/js";
+import { MdiIcon } from "./components/MdiIcon";
 import {
   getDaysSinceLastCake,
   getDaysBeforeLastCake,
@@ -21,6 +25,7 @@ const REVEAL_DURATION_MS = 8700;
 
 function App() {
   const { entries, loading, error, addCake, reload } = useCakes();
+  const { user, authEnabled, loading: authLoading, logout } = useAuth();
   const [now, setNow] = useState(() => new Date());
   const [historyOpen, setHistoryOpen] = useState(false);
   const simulatedDays = getSimulatedDays();
@@ -91,6 +96,7 @@ function App() {
         <div className="atmosphere-embers" />
       </div>
       <ThemeToggle />
+      <UserProfile user={user} authEnabled={authEnabled} loading={authLoading} onLogout={logout} />
       <div className={`app-quake${levels.shake > 0 ? " app-quake--on" : ""}`}>
         <header className="app-header">
           <h1 className="app-logo">
@@ -114,7 +120,17 @@ function App() {
                   </button>
                 </p>
               )}
-              <CakeForm onSubmit={addCake} />
+              {(!authEnabled || user) ? (
+                <CakeForm onSubmit={addCake} defaultName={user?.name ?? ""} />
+              ) : (
+                <div className="auth-notice-card">
+                  <p>Bitte melde dich an, um einen Kuchen einzutragen.</p>
+                  <a href="/api/auth/login" className="login-btn" style={{ textDecoration: "none" }}>
+                    <MdiIcon path={mdiLogin} size={18} />
+                    <span>Anmelden mit Dex</span>
+                  </a>
+                </div>
+              )}
               <Forecast entries={forecastEntries} onOpenHistory={() => setHistoryOpen(true)} />
             </>
           )}

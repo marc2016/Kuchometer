@@ -21,9 +21,14 @@ services:
       DATABASE_URL: postgres://kuchometer:kuchometer@db:5432/kuchometer
       PORT: 3001
       TZ: Europe/Berlin
+      AUTH_ENABLED: "true"
+      DEX_INTERNAL_URL: http://dex:5556/dex
+      DEX_EXTERNAL_URL: http://localhost:5556/dex
     depends_on:
       db:
         condition: service_healthy
+      dex:
+        condition: service_started
 
   web:
     build: ./frontend
@@ -31,6 +36,14 @@ services:
       - "8080:80"
     depends_on:
       - api
+
+  dex:
+    image: ghcr.io/dexidp/dex:v2.41.1
+    ports:
+      - "5556:5556"
+    volumes:
+      - ./dex-config.yaml:/etc/dex/config.docker.yaml
+    entrypoint: ["/usr/local/bin/dex", "serve", "/etc/dex/config.docker.yaml"]
 
 volumes:
   postgres_data:

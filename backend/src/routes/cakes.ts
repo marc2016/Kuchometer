@@ -1,8 +1,10 @@
 import { Router } from "express";
 import pool from "../db.js";
 import { rowToEntry, type CakeRow } from "../types.js";
+import { parseCookies, verifySession } from "../utils/auth.js";
 
 const router = Router();
+const AUTH_ENABLED = process.env.AUTH_ENABLED === "true";
 
 function getTodayBerlin(): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -23,6 +25,16 @@ router.get("/", async (_req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  if (AUTH_ENABLED) {
+    const cookies = parseCookies(req.headers.cookie);
+    const session = cookies["kuchometer_session"];
+    const user = session ? verifySession(session) : null;
+    if (!user) {
+      res.status(401).json({ error: "Bitte melde dich zuerst an." });
+      return;
+    }
+  }
+
   const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
   const date =
     typeof req.body?.date === "string" && req.body.date.trim()
