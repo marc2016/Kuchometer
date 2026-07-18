@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import historyIcon from "../assets/history-icon.png";
 import emptyPlateIcon from "../assets/empty-plate-icon.png";
 import type { CakeEntry } from "../types/cake";
@@ -14,13 +14,27 @@ export function Forecast({ entries, onOpenHistory }: ForecastProps) {
   const today = getTodayString();
   const forecastDays = getForecastDays(10);
   const [openDate, setOpenDate] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setOpenDate(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   function handleDayClick(dateStr: string) {
     setOpenDate((current) => (current === dateStr ? null : dateStr));
   }
 
   return (
-    <div className="forecast-section">
+    <div className="forecast-section" ref={containerRef}>
       <h2 className="forecast-title">
         <span className="forecast-title-text">🍰 Kuchenvorhersage der nächsten Tage</span>
       </h2>
