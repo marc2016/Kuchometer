@@ -86,8 +86,8 @@ fi
 
 # Versionen in den package.json-Dateien anpassen
 echo -e "${GREEN}Aktualisiere Version in frontend & backend...${NC}"
-npm --prefix frontend version "$VERSION" --no-git-tag-version
-npm --prefix backend version "$VERSION" --no-git-tag-version
+npm --prefix frontend version "$VERSION" --no-git-tag-version --allow-same-version
+npm --prefix backend version "$VERSION" --no-git-tag-version --allow-same-version
 
 # Änderungen commiten
 echo -e "${GREEN}Erstelle Commit für den Versions-Bump...${NC}"
