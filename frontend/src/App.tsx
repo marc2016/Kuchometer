@@ -23,6 +23,8 @@ import { getPressureLevels } from "./utils/pressure";
 import { triggerCakeRain } from "./utils/cakeConfetti";
 import "./App.css";
 
+declare const __APP_VERSION__: string;
+
 const REVEAL_DURATION_MS = 8700;
 
 function App() {
@@ -175,6 +177,11 @@ function App() {
       </div>
 
       <HistoryModal entries={entries} open={historyOpen} onClose={() => setHistoryOpen(false)} />
+      <span className="app-version-badge">
+        {typeof __APP_VERSION__ !== "undefined"
+          ? (__APP_VERSION__.startsWith("v") ? __APP_VERSION__ : `v${__APP_VERSION__}`)
+          : "v0.0.0"}
+      </span>
     </div>
   );
 }

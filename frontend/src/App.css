@@ -1493,3 +1493,17 @@ input {
   transform: scale(0.94);
 }
 
+.app-version-badge {
+  position: fixed;
+  bottom: 8px;
+  right: 8px;
+  font-size: 0.65rem;
+  font-family: monospace;
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 1000;
+  color: var(--text);
+  user-select: none;
+}
+
+
