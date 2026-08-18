@@ -17,4 +17,4 @@ npm install
 npm run dev
 ```
 
-Frontend: [http://localhost:5173](http://localhost:5173) · Mit Docker: `docker compose up`
+Frontend: [http://localhost:5173](http://localhost:5173) · Mit Docker: `docker compose up` → [http://localhost:8080](http://localhost:8080)
