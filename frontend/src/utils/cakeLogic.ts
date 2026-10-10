@@ -2,7 +2,8 @@ import type { CakeEntry } from "../types/cake";
 import { getCakeResetTime, getTodayString } from "./dateUtils";
 
 export function getActiveCakeEntries(entries: CakeEntry[], now = new Date()): CakeEntry[] {
-  return entries.filter((entry) => getCakeResetTime(entry.date) <= now);
+  const today = getTodayString(now);
+  return entries.filter((entry) => entry.date <= today);
 }
 
 export function getLastResetTime(entries: CakeEntry[], now = new Date()): Date | null {
@@ -23,6 +24,10 @@ export function getLastResetTime(entries: CakeEntry[], now = new Date()): Date |
 }
 
 export function getDaysSinceLastCake(entries: CakeEntry[], now = new Date()): number | null {
+  if (isLastCakeToday(entries, now)) {
+    return 0;
+  }
+
   const lastReset = getLastResetTime(entries, now);
   if (!lastReset) {
     return null;

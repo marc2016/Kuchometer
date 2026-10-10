@@ -7,8 +7,11 @@ import { DaysCounter } from "./components/DaysCounter";
 import { Forecast } from "./components/Forecast";
 import { HistoryModal } from "./components/HistoryModal";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { SettingsToggle } from "./components/SettingsToggle";
+import { SettingsModal } from "./components/SettingsModal";
 import { useCakes } from "./hooks/useCakes";
 import { useAuth } from "./hooks/useAuth";
+import { useSettings } from "./hooks/useSettings";
 import { UserProfile } from "./components/UserProfile";
 import { mdiLogin } from "@mdi/js";
 import { MdiIcon } from "./components/MdiIcon";
@@ -30,8 +33,10 @@ const REVEAL_DURATION_MS = 8700;
 function App() {
   const { entries, loading, error, addCake, reload } = useCakes();
   const { user, authEnabled, loading: authLoading, logout } = useAuth();
+  const { settings, updateSetting } = useSettings();
   const [now, setNow] = useState(() => new Date());
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [simulatedDays, setSimulatedDays] = useState<number | null>(() => getSimulatedDays());
   const hasRainRun = useRef(false);
 
@@ -46,6 +51,14 @@ function App() {
       }
     }
     setSimulatedDays(val);
+  };
+
+  const handleAddCake = async (name: string, date?: string) => {
+    await addCake(name, date);
+    setNow(new Date());
+    if (simulatedDays !== null) {
+      handleSimulatedDaysChange(null);
+    }
   };
 
   const prefersReducedMotion =
@@ -111,7 +124,7 @@ function App() {
     steam: baseLevels.steam * reveal,
     crack: baseLevels.crack * reveal,
     flame: baseLevels.flame * reveal,
-    shake: baseLevels.shake * reveal,
+    shake: settings.disableWobble ? 0 : baseLevels.shake * reveal,
   };
   const pressureStyle = {
     ["--pressure" as string]: levels.pressure,
@@ -123,19 +136,22 @@ function App() {
   } as CSSProperties;
 
   return (
-    <div className="app" style={pressureStyle}>
+    <div className={`app${settings.disableWobble ? " no-wobble" : ""}`} style={pressureStyle}>
       <div className="atmosphere" aria-hidden="true">
         <div className="atmosphere-tint" />
         <div className="atmosphere-vignette" />
         <div className="atmosphere-embers" />
       </div>
-      <ThemeToggle />
+      <div className="header-actions">
+        <UserProfile user={user} authEnabled={authEnabled} loading={authLoading} onLogout={logout} />
+        <SettingsToggle onClick={() => setSettingsOpen(true)} />
+        <ThemeToggle />
+      </div>
       <DevPanel
         simulatedDays={simulatedDays}
         onChangeSimulatedDays={handleSimulatedDaysChange}
         currentDays={days}
       />
-      <UserProfile user={user} authEnabled={authEnabled} loading={authLoading} onLogout={logout} />
       <div className={`app-quake${levels.shake > 0 ? " app-quake--on" : ""}`}>
         <header className="app-header">
           <h1 className="app-logo">
@@ -145,7 +161,12 @@ function App() {
         </header>
 
         <main className="app-main">
-          <Barometer days={days} introFromDays={introFromDays} ready={!loading} />
+          <Barometer
+            days={days}
+            introFromDays={introFromDays}
+            ready={!loading}
+            disableWobble={settings.disableWobble}
+          />
 
           {loading ? (
             <p className="status-message">Lade Kuchen-Daten…</p>
@@ -160,7 +181,12 @@ function App() {
                 </p>
               )}
               {(!authEnabled || user) ? (
-                <CakeForm onSubmit={addCake} defaultName={user?.name ?? ""} />
+                <CakeForm
+                  onSubmit={handleAddCake}
+                  defaultName={user?.name ?? ""}
+                  readOnlyName={authEnabled && !!user}
+                  existingEntries={entries}
+                />
               ) : (
                 <div className="auth-notice-card">
                   <p>Bitte melde dich an, um einen Kuchen einzutragen.</p>
@@ -177,6 +203,12 @@ function App() {
       </div>
 
       <HistoryModal entries={entries} open={historyOpen} onClose={() => setHistoryOpen(false)} />
+      <SettingsModal
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        settings={settings}
+        onUpdateSetting={updateSetting}
+      />
       <span className="app-version-badge">
         {typeof __APP_VERSION__ !== "undefined"
           ? (__APP_VERSION__.startsWith("v") ? __APP_VERSION__ : `v${__APP_VERSION__}`)

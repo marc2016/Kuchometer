@@ -25,6 +25,8 @@ router.get("/", async (_req, res) => {
 });
 
 router.post("/", async (req, res) => {
+  let name = "";
+
   if (AUTH_ENABLED) {
     const cookies = parseCookies(req.headers.cookie);
     const session = cookies["kuchometer_session"];
@@ -33,9 +35,11 @@ router.post("/", async (req, res) => {
       res.status(401).json({ error: "Bitte melde dich zuerst an." });
       return;
     }
+    name = user.name;
+  } else {
+    name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
   }
 
-  const name = typeof req.body?.name === "string" ? req.body.name.trim() : "";
   const date =
     typeof req.body?.date === "string" && req.body.date.trim()
       ? req.body.date.trim()
@@ -52,6 +56,17 @@ router.post("/", async (req, res) => {
   }
 
   try {
+    // Verhindert doppelte Kuchen desselben Benutzers am selben Tag
+    const existing = await pool.query(
+      "SELECT id FROM cake_entries WHERE date = $1::date AND LOWER(TRIM(name)) = LOWER(TRIM($2))",
+      [date, name]
+    );
+
+    if (existing.rows.length > 0) {
+      res.status(409).json({ error: "Du hast für diesen Tag bereits einen Kuchen eingetragen." });
+      return;
+    }
+
     const result = await pool.query<CakeRow>(
       "INSERT INTO cake_entries (date, name) VALUES ($1::date, $2) RETURNING id, date, name, created_at",
       [date, name]

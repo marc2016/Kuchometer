@@ -5,6 +5,7 @@ interface BarometerProps {
   days: number | null;
   introFromDays?: number | null;
   ready?: boolean;
+  disableWobble?: boolean;
 }
 
 const DOWN_DURATION_MS = 4200;
@@ -223,10 +224,15 @@ function generateCracks(holes: GlassHole[]): GlassCrack[] {
   return result;
 }
 
-export function Barometer({ days, introFromDays = null, ready = true }: BarometerProps) {
+export function Barometer({
+  days,
+  introFromDays = null,
+  ready = true,
+  disableWobble = false,
+}: BarometerProps) {
   const targetPosition = toPosition(days);
   const cappedDays = days === null ? 30 : Math.min(days, 30);
-  const wobble = 0.12 + (cappedDays / 30) * 0.88;
+  const wobble = disableWobble ? 0 : 0.12 + (cappedDays / 30) * 0.88;
 
   const prefersReducedMotion =
     typeof window !== "undefined" &&
@@ -281,13 +287,30 @@ export function Barometer({ days, introFromDays = null, ready = true }: Baromete
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
+  const prevPositionRef = useRef(displayPosition);
+
   // Nach der Intro-Animation folgt der Zeiger normalen Änderungen.
   useEffect(() => {
     if (!introDone.current) {
+      prevPositionRef.current = targetPosition;
       return;
     }
+
+    // Wenn der Stand sinkt (z. B. Kuchen eingetragen): sanftes Absinken
+    if (targetPosition < prevPositionRef.current && !prefersReducedMotion) {
+      const dropDurationMs = 1800;
+      setTransition(
+        `left ${dropDurationMs}ms cubic-bezier(0.34, 1.12, 0.44, 1), transform ${dropDurationMs}ms cubic-bezier(0.34, 1.12, 0.44, 1)`
+      );
+      setDisplayPosition(targetPosition);
+      const timer = window.setTimeout(() => setTransition(undefined), dropDurationMs + 100);
+      prevPositionRef.current = targetPosition;
+      return () => window.clearTimeout(timer);
+    }
+
     setDisplayPosition(targetPosition);
-  }, [targetPosition]);
+    prevPositionRef.current = targetPosition;
+  }, [targetPosition, prefersReducedMotion]);
 
   return (
     <div className="barometer" aria-label="Kuchometer Barometer">
